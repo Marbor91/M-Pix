@@ -1,0 +1,2 @@
+#define STATUS 	1
+#define STEP	10
