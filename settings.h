@@ -9,10 +9,11 @@ extern Adafruit_NeoPixel strip;
 
 unsigned long time_finish;	
 volatile int 	LED_Brightness =  80;		// яркость от 0 до 255
-volatile int		 LED_count =	72;			// кол-во диодов. максимальное кстати, тут хз
-volatile int Type_of_strip = 213;				// 1 -R, 2 - G, 3 - B. Тип ленты. Подбирается сука эмперически.
+volatile int		 LED_count =		72;			// кол-во диодов. максимальное кстати, тут хз
+volatile int Type_of_strip = 		213;				// 1 -R, 2 - G, 3 - B. Тип ленты. Подбирается сука эмперически.
 
-#define CMD_LENGTH			15				// длина команды максимальное
+#define CMD_LENGTH					15				// длина команды максимальное
+#define LED_CHRG_IND_COUNT		10				// кол-во диодов для индикации и вывода ошибок
 
 struct data {	char cmd[CMD_LENGTH]={};  		// держим в структуре команду в символах и время в инте ОСНОВНАЯ ПЕРЕМЕННАЯ
 					unsigned int time=0;
@@ -31,6 +32,7 @@ struct data {	char cmd[CMD_LENGTH]={};  		// держим в структуре 
 
 //#define DEBUG  0		// вывод отладки включить или нет.
 
+
 unsigned long lightblue_color = 0x00BCFF;
 //unsigned long deepblue_color = 	0x0000FF;
 unsigned long turquoise_color = 0x00FFF7;
@@ -38,17 +40,26 @@ unsigned long pink_color = 		0xFF00DE;
 unsigned long coldwhite_color = 0xFFFAFA;
 
 unsigned long red_color = 			0xFF0000;
+unsigned long orange_color =		0xFF8C00;
+unsigned long yellow_color = 		0xFFFF00;
 unsigned long green_color =		0x00FF00;
 unsigned long blue_color = 		0x0000FF;
+
 unsigned long black_color = 		0x000000;
 unsigned long violet_color = 		0xEE82EE;
 unsigned long warmwhite_color = 		0xfff178;
+
 
 void Strip_clear(void);			// очистка ленты и проецирование. Можно добавить вывод отладки
 void Pause (unsigned long fin_time, unsigned int pause); // пауза в исполнении эффектов
 void Static_color_burn(unsigned long color);
 void Fall_color_burn(unsigned long color);
 void Rise_color_burn(unsigned long color);
+void Noise(void);
+void Pixel(void);
+void Pogas(void);
+void Tsvet(void);
+void Strob(void);
 
 void NewKITT(unsigned long color, int EyeSize, int SpeedDelay, int ReturnDelay);
 
@@ -72,6 +83,170 @@ void Sparkle(unsigned long color, int SpeedDelay);
 void FadeInOut(unsigned long color);
 
 
+void Strob()
+{
+	time_finish  =millis() + (unsigned long)sddata.time*1000;
+	// запомнить время старта эффекта
+	while (time_finish>millis())		// крутим пока не истечет время эффекта	
+	{
+		for (byte i = 0; i < LED_count; i++)
+		{  // включаем светодиоды
+			strip.setPixelColor(i,0xFFFFFF); 
+		}
+
+		strip.show(); // Передаем цвета ленте.
+		Pause(time_finish,80);
+		//delay(80);
+		strip.clear();
+		strip.show();// отправить на ленту;
+		Pause(time_finish,80);
+		//delay(80);
+	}
+	Strip_clear();
+	//DEBUG(F("fin"));
+	//DEBUG(millis());
+}
+void Tsvet()
+{
+//DEBUG(F("strt"));
+//DEBUG(millis());
+static int del_colors = 100;
+time_finish  =millis() + (unsigned long)sddata.time*1000;
+while (time_finish>millis())		// крутим пока не истечет время эффекта
+{
+	for (byte i = 0; i < LED_count / 3; i++ ){   // от 0 до первой трети
+	strip.setPixelColor(i, 0xff0000);     // залить красным
+	strip.show();                         // отправить на ленту
+	
+	Pause (time_finish,del_colors); // Ждем 100 мс
+	}
+	for (byte i = LED_count / 3; i < LED_count * 2 / 3; i++ ) {   // от 1/3 до 2/3
+	strip.setPixelColor(i, 0x00ff00);     // залить зелёным
+	strip.show();                         // отправить на ленту
+	Pause (time_finish,del_colors); // Ждем 100 мс
+	}
+	for (byte i = LED_count * 2 / 3; i < LED_count; i++ ) {   // от 2/3 до конца
+	strip.setPixelColor(i, 0x0000ff);     // залить синим
+	strip.show();                         // отправить на ленту
+	Pause (time_finish,del_colors); // Ждем 100 мс
+	}
+	Pause (time_finish,del_colors); // Ждем 100 мсdelay(500); // Ждем 1000 мс
+	for (byte i = 0; i < LED_count; i++ ) {   // всю ленту
+	strip.setPixelColor(i, 0x000000);     // залить чёрным
+	strip.show();                         // отправить на ленту
+	Pause (time_finish,10); // Ждем 100 мс
+	}
+	Pause (time_finish,del_colors); // Ждем 100 мс
+	for (byte i = 0; i < LED_count; i++ ) {   // включаем случайные диоды жёлтым       
+	strip.setPixelColor(random(0, LED_count), 0xffff00);     // залить жёлтым
+	strip.show();                         // отправить на ленту
+	Pause (time_finish,del_colors); // Ждем 100 мс
+	}
+}
+//DEBUG(F("strt"));
+//DEBUG(millis());
+Strip_clear();
+}
+void Pogas()
+{
+	DEBUG(F("BRG:"));
+	DEBUG(LED_Brightness);
+	time_finish  =millis() + (unsigned long)sddata.time*1000;
+	while (time_finish>millis())		// крутим пока не истечет время эффекта
+	{
+		 for(byte k=0; k<LED_Brightness; k++)
+		{ // условие повышение яркости светодиодов
+			 for (byte i = 0; i < LED_count; i++) // включение всей ленты
+			  {
+				strip.setPixelColor(i, violet_color); // Фиолетовый цвет.
+			  }
+			  strip.setBrightness(k); 
+			  strip.show(); // Ждем 500 мс.
+			  Pause(time_finish,50);
+		}
+		for(byte k=LED_Brightness; k>1; k--) 
+		{ // плавное угасание светодиода шаг к модно сделать любым по умолчанию стоит к=1 
+			 for (byte i = 0; i < LED_count; i++) // включение всей ленты
+			  {
+				strip.setPixelColor(i, violet_color); // Фиолетовый цвет
+			  }
+			strip.setBrightness(k); // яркость
+			strip.show();
+			Pause(time_finish,50); 
+			
+		}
+	}
+	Strip_clear();
+	strip.setBrightness(LED_Brightness);		// возвращаем стандартную яркость
+	DEBUG(F("BRG:"));
+	DEBUG(LED_Brightness);
+
+}
+void Noise()
+{
+	//DEBUG(F("strt"));
+	//DEBUG(millis());
+	time_finish  =millis() +(unsigned long)sddata.time*1000;
+	while (time_finish>millis())		// крутим пока не истечет время эффекта
+	{
+	//Strip_clear();
+		for (byte i = 0; i < LED_count; i++)
+		{
+		//randomSeed(analogRead(0));
+		byte randNumber1 = random(255);
+		byte randNumber2 = random(255);
+		byte randNumber3 = random(255);
+		strip.setPixelColor(i, strip.Color(randNumber1,randNumber2, randNumber3));
+		}
+		strip.show(); 
+		Pause (time_finish,20);
+		//DEBUG(F("fin"));
+	//DEBUG(millis());
+	}
+	Strip_clear();
+}
+void Pixel()
+{
+	//DEBUG(F("strt"));
+	//DEBUG(millis());
+	//randomSeed(analogRead(0));
+	int row1_lim  = LED_count/5;
+	int row2_lim  = (LED_count/5*2);
+	int row3_lim  = (LED_count/5*3);
+	int row4_lim  = (LED_count/5*4);
+	int row5_lim  = LED_count;
+	time_finish  =millis() + (unsigned long)sddata.time*1000;
+	while (time_finish>millis())		// крутим пока не истечет время эффекта
+	{
+		for (int i = 0; i < row1_lim; i++ ) {   // всю ленту
+		strip.setPixelColor(i, random(0x000000,0xFFFFFF));     // залить зелень
+		}
+		strip.show();                         // отправить на ленту
+		Pause (time_finish,100); // Ждем 100 мс
+		for (int i = (row1_lim+1); i < row2_lim; i++ ) {   // всю ленту
+		strip.setPixelColor(i, random(0x000000,0xFFFFFF));     // залить синий
+		}
+		strip.show();                         // отправить на ленту
+		Pause (time_finish,100); // Ждем 100 мс
+		for (int i = (row2_lim+1); i < row3_lim; i++ ) {   // от 0 до первой трети
+		strip.setPixelColor(i, random(0x000000,0xFFFFFF));     // залить жёлтый
+		}
+		Pause (time_finish,100); // Ждем 100 мс
+		for (int i = (row3_lim+1); i < row4_lim; i++ ) {   // от 0 до первой трети
+		strip.setPixelColor(i, random(0x000000,0xFFFFFF));     // залить жёлтый
+		}
+		strip.show();                         // отправить на ленту
+		Pause (time_finish,100); // Ждем 100 мс
+		for (int i = (row4_lim+1); i < row5_lim; i++ ) {   // от 0 до первой трети
+		strip.setPixelColor(i, random(0x000000,0xFFFFFF));     // залить жёлтый
+		}
+		strip.show();                         // отправить на ленту
+		Pause (time_finish,100); // Ждем 100 мс
+	}
+	Strip_clear();
+	//DEBUG(F("fin"));
+	//DEBUG(millis());
+}
 
 void Static_color_burn(unsigned long color)
 {
