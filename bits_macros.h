@@ -1,0 +1,5 @@
+#define   SetBit(reg, bit)          reg =reg| (1<<bit)           
+#define   ClearBit(reg, bit)       reg=reg& (~(1<<bit))
+#define   InvBit(reg, bit)          reg =reg^ (1<<bit)
+#define   BitIsSet(reg, bit)       ((reg & (1<<bit)) != 0)
+#define   BitIsClear(reg, bit)    ((reg & (1<<bit)) == 0)
