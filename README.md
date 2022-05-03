@@ -42,4 +42,4 @@ Changelog:
  Во время старта устройства от акума - индикация заряда один раз
  Во время зарядки - индикация постоянна
  
- # Features is not deployed
+ # Features are not deployed

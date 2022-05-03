@@ -204,15 +204,7 @@ void setup()
   /*================ RECIEVER =======================*/
   setupReceiver(RECEIVER_PIN);
   Serial.println(F("Receiver ready"));
-  
-/*    	  unsigned char number[10];
-	  uint8_t receive_flag = 0;
-	  Serial.print(F("Wait delay: "));
-	  Serial.setTimeout(5000);
-	  sort_type = (uint16_t)Serial.parseInt();
-	Serial.print(F("delay: "));
-	Serial.println(sort_type);  */
-	
+
   /*================ END =======================*/
   Serial.print(F("Initializing SD card..."));
   	 // see if the card is present and can be initialized:
@@ -315,10 +307,6 @@ if(start_flag!=0)
     return;
   }
 
-/*   if(err == TRF_ERR_CORRUPTED){
-    //Serial.println("Received corrupted data.");
-    //return;
-  } */
   
   //**************** ЕСли ловим хоотя бы поврежденный пакет с стартом, то начинаем проигрывание *********************//
   if(err == TRF_ERR_SUCCESS || err == TRF_ERR_CORRUPTED)
@@ -328,7 +316,7 @@ if(start_flag!=0)
 		Serial.print((char)buf[j]);
 	} 
 	Serial.println ('!'); */ 
-	//uint8_t i = 0;	 
+ 
 	start_flag = 1;	
 }
   /*================ END =======================*/
@@ -584,19 +572,7 @@ int Parser()
 
 
   	sddata.time = atoi(number);					// переводим в инт
-	// DEBUG
-/* 	Serial.print("NUM:");
-	Serial.println(sddata.time,DEC);
-	Serial.print(",");
-	Serial.write(number[0]);
-	Serial.write(number[1]);
-	Serial.write(number[2]);
-	Serial.write(number[3]); 
-	
-	//Serial.println(i);
-	
-	//Serial.println("Cmd_recieved");
-	*/
+
 
 	Serial.print(sddata.cmd);
 	Serial.print(',');
@@ -611,13 +587,7 @@ int Parser()
 	return 1;
   
 }
-/* 
-void flush_controll_data(void)
-{
-	memset(sddata.cmd, 0, sizeof(sddata.cmd));	// очистить массив
-	sddata.time=0;	// очистить массив
-	memset(sddata.color, 0, sizeof(sddata.color));	// очистить массив
-} */
+
 
 // ошибка чтения карты, мигаем красным
 void SD_Error()
