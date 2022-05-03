@@ -179,23 +179,6 @@ ISR (PCINT2_vect)
 		start_flag = 1;
 }
 
-//volatile char c;
-//bool flag_finish_prog = true;
-//bool flag_start_prog = false;
-
-/* void Strip_clear(void);			// очистка ленты и проецирование. Можно добавить вывод отладки
-void Pause (unsigned long fin_time, unsigned int pause); // пауза в исполнении эффектов
-void Static_color_burn(unsigned long color);
-void Fall_color_burn(unsigned long color);
-void Rise_color_burn(unsigned long color);
-void meteorRain(unsigned long color, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
-void fadeToBlack(int ledNo, byte fadeValue);
-void setAll(byte red, byte green, byte blue);
-void setPixel(int Pixel, byte red, byte green, byte blue);
-void showStrip();
-void Sparkle(unsigned long color, int SpeedDelay);
-void FadeInOut(unsigned long color); */
-
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
@@ -218,14 +201,6 @@ void setup()
   #ifndef ROLE
   setupReceiver(RECEIVER_PIN);
   Serial.println(F("Receiver ready"));
-  
-/*    	  unsigned char number[10];
-	  uint8_t receive_flag = 0;
-	  Serial.print(F("Wait delay: "));
-	  Serial.setTimeout(5000);
-	  sort_type = (uint16_t)Serial.parseInt();
-	Serial.print(F("delay: "));
-	Serial.println(sort_type);  */
   
   #else
   /*================ TRANSMITTER =======================*/
@@ -872,58 +847,3 @@ void SD_Error()
 	Static_color_burn(black_color);
 }
 
-
-
-/*
-void Charge_state()
-{
-	if (chr_status ==1)
-	{
-			if (digitalRead(CHR_PROC_PIN) ==0)
-			{
-				uint32_t buf = 0;
-				for (uint_8t i = 0; i<=SMPL_SIZE; i++)
-				{
-					buf+=analogRead(VBAT_PIN)
-				}
-				uint16_t val = buf/SMPL_SIZE;
-				uint16_t volt_value = (ADC_REF*val)/ADC_RES*2;
-				if (volt_value<V_MIN)
-				{
-					// Усажен в говно
-				}
-				else if (volt_value>=V_MIN && volt_value<=V_MIN+V_IND_STEP)
-				{
-					//0-25%
-				}
-				else if (volt_value>=V_MIN+V_IND_STEP && volt_value<=V_MIN+2*V_IND_STEP)
-				{
-					//25-50%
-				}
-				else if (volt_value>=V_MIN+2*V_IND_STEP && volt_value<=V_MIN+3*V_IND_STEP)
-				{
-					//50-75%
-				}
-				else if (volt_value>=V_MIN+3*V_IND_STEP && volt_value<=V_MIN+4*V_IND_STEP)
-				{
-					//75-99%
-				}
-			
-				}
-			else if (digitalRead(CHR_STDBY_PIN) ==0)
-			{
-				// 100%
-			}
-		else 
-		{
-			// иначе нет зарядки, чисто выводим на пару секунд индикацию и больше не возвращаемся к функции
-		}
-	}
-	
-}
-void Charging_indication()
-{
-	
-}
-
-*/
